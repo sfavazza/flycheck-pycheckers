@@ -313,6 +313,7 @@ class LintRunner(object):
         substitutions = {
             '%f': filepath,
         }
+
         def map_substitution(part):
             # type: (str) -> str
             return substitutions.get(part, part)
@@ -328,7 +329,7 @@ class LintRunner(object):
             return args
 
         # `env` to use a virtualenv, if found
-        args = env_argument + [self.command]
+        args = self.env_argument + [self.command]
         # Get checker arguments
         args.extend(self.get_run_flags(filepath))
         # Get a checker-specific filename, if necessary
@@ -342,7 +343,7 @@ class LintRunner(object):
         """Construct the argument list for finding the parser's version, suitable for passing to Popen."""
 
         # `env` to use a virtualenv, if found
-        args = env_argument + [self.command]
+        args = self.env_argument + [self.command]
         # Get checker arguments
         args.extend(self.version_args)
         return args
@@ -398,7 +399,7 @@ class LintRunner(object):
     def _executable_exists(self):
         # type: () -> bool
         # https://stackoverflow.com/a/6569511/52550
-        args = env_argument + ['which', self.command]
+        args = self.env_argument + ['which', self.command]
         try:
             process = Popen(args, stdout=PIPE, stderr=PIPE)
         except Exception as e:                   # pylint: disable=broad-except
@@ -469,7 +470,7 @@ class LintRunner(object):
                         self.command, line, filepath)]
 
         et = time.time()
-        self.debug('Start: %.2fs  end: %.2fs  duration: %.2fs' % (st, et, (et-st)))
+        self.debug('Start: %.2fs  end: %.2fs  duration: %.2fs' % (st, et, (et - st)))
 
         if self.options.debug:
             debug_output = self._get_debug_output()
@@ -744,7 +745,6 @@ class MyPy2Runner(LintRunner):
         # root that checks everything.
         return self.options.mypy_use_daemon
 
-
     output_matcher = re.compile(
         r'(?P<filename>[^:]+):'
         r'(?P<line_number>\d+):'
@@ -837,7 +837,6 @@ class MyPy2Runner(LintRunner):
                 # current file buffer.
                 raise FatalException('Mypy daemon files command failed: ' + str(exc),
                                      filepath)
-
 
         return flags
 
