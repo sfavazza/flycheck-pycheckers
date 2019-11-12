@@ -110,6 +110,11 @@ class LintRunner(object):
 
     version_matcher = re.compile(r'')
 
+    # system dependent definitions
+    env_argument = ['/usr/bin/env']
+    if sys.platform == "win32":
+        env_argument = []
+
     def __init__(self, ignore_codes, enable_codes, options):
         # type: (Tuple[str], Tuple[str], Namespace) -> None
         self._ignore_codes = set(ignore_codes) if ignore_codes is not None else None
@@ -323,7 +328,7 @@ class LintRunner(object):
             return args
 
         # `env` to use a virtualenv, if found
-        args = ['/usr/bin/env', self.command]
+        args = env_argument + [self.command]
         # Get checker arguments
         args.extend(self.get_run_flags(filepath))
         # Get a checker-specific filename, if necessary
@@ -337,7 +342,7 @@ class LintRunner(object):
         """Construct the argument list for finding the parser's version, suitable for passing to Popen."""
 
         # `env` to use a virtualenv, if found
-        args = ['/usr/bin/env', self.command]
+        args = env_argument + [self.command]
         # Get checker arguments
         args.extend(self.version_args)
         return args
@@ -393,7 +398,7 @@ class LintRunner(object):
     def _executable_exists(self):
         # type: () -> bool
         # https://stackoverflow.com/a/6569511/52550
-        args = ['/usr/bin/env', 'which', self.command]
+        args = env_argument + ['which', self.command]
         try:
             process = Popen(args, stdout=PIPE, stderr=PIPE)
         except Exception as e:                   # pylint: disable=broad-except

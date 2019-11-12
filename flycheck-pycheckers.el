@@ -164,7 +164,12 @@
 
 (defvar flycheck-pycheckers-command
   (executable-find (concat (file-name-directory (or load-file-name buffer-file-name))
-                           "bin/pycheckers.py")))
+                           "bin/pycheckers"
+                           (cond
+                            ((string= system-type "windows-nt")
+                             ".bat")
+                            (t
+                             ".py")))))
 
 (flycheck-def-args-var flycheck-pycheckers-args python-pycheckers
   )
