@@ -86,7 +86,7 @@ def croak(msgs, filename):
     sys.exit(1)
 
 
-class LintRunner(object):
+class LintRunner():
     """Base class provides common functionality to run python code checkers."""
 
     out_fmt = ("%(level)s %(error_type)s%(error_number)s:"
@@ -189,7 +189,7 @@ class LintRunner(object):
         }
 
         if self.name in CHECKER_ACCEPTABLE_CODES:
-            ret = set([r for r in ret if r in CHECKER_ACCEPTABLE_CODES[self.name]])
+            ret = {r for r in ret if r in CHECKER_ACCEPTABLE_CODES[self.name]}
         return ret
 
     @property
@@ -1181,12 +1181,12 @@ def main():
     set_path_for_virtualenv(source_file_path, options.venv_path, options.venv_root)
 
     checker_names = [checker.strip() for checker in checkers.split(',')]
-    try:
-        [RUNNERS[checker_name] for checker_name in checker_names]
-    except KeyError:
-        croak(("Unknown checker {}".format(checker_name),  # pylint: disable=used-before-assignment
-               "Expected one of %s" % ', '.join(RUNNERS.keys())),
-              filename=options.file)
+    available_runners = RUNNERS.keys()
+    for checker_name in checker_names:
+        if checker_name not in available_runners:
+            croak(("Unknown checker {}".format(checker_name),
+                   "Expected one of %s" % ', '.join(RUNNERS.keys())),
+                  filename=options.file)
 
     if options.multi_thread:
         from multiprocessing import Pool, cpu_count
